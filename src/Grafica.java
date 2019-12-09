@@ -16,6 +16,7 @@ class Grafica {
 
 	//componentele ferestrei principale
 	static JPanel fereastraPr = new JPanel(new BorderLayout());
+	static JPanel fereastraPrUtil = new JPanel(new BorderLayout());
     static JPanel optiuni = new JPanel(new GridLayout(3,1));
     static JPanel nord = new JPanel(new GridLayout(1,3,3,3));
     static JList lista;
@@ -25,6 +26,8 @@ class Grafica {
     static JLabel descriere, image;
     static Becuri[] obiecte;
     static double pretIn;
+    static String numeUtil;
+    
 
     //componentele ferestrei de login
     static JPanel mainPanel, loginPanel, imagePanel, buttonPanel;
@@ -187,7 +190,7 @@ class Grafica {
     	scroll.setViewportView(lista);
     }
 
-    //metoda care afla care gestioneaza informatiile noi si adauga produsul rezultat in fisier
+    //metoda care gestioneaza informatiile noi si adauga produsul rezultat in fisier
     private static void addCont(Becuri obj) {
     	try {
     	ArrayList<ArrayList> inst = readInstante();
@@ -456,8 +459,9 @@ class Grafica {
         		    	JOptionPane.showMessageDialog(mainPanel, "Buna " + userName + "!");
         		    	adminPriv = true;
         		    	conditie = true;
+        		    	numeUtil = userName.trim();
         		    	changePanel(fereastraPr);
-        		    	setTitle("Produse");
+        		    	setTitle("Produse - " + numeUtil);
         		    	setSize(400,400);
         		    	break;
         		    }
@@ -469,8 +473,9 @@ class Grafica {
         		    	{
         		    		JOptionPane.showMessageDialog(mainPanel, "Buna " + userName + "!");
             		    	adminPriv = true;
+            		    	numeUtil = "admin";
             		    	changePanel(fereastraPr);
-            		    	setTitle("Produse");
+            		    	setTitle("Produse - " + numeUtil);
             		    	setSize(400,400);
         		    	}
         		    	else
@@ -530,26 +535,35 @@ class Grafica {
         nord.add(cautare);
         nord.add(adaugare);
 
-        //adaugarea ascultatorului pentru butonul de cautare dupa pret
+        //adaugarea ascultatorului pentru butonul de stergere produs
         stergere.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		if(lista.getSelectedValue() == null)
-        		JOptionPane.showMessageDialog(fereastraPr, "Alegeti un produs!");
-        		else {
-        		String a = lista.getSelectedValue().toString();
-        		for(int i = 0; i < totalFis; i++) {
-        			if(obiecte[i].getAfisare().equals(lista.getSelectedValue().toString())) {
-        				deleteInstante(obiecte[i]);
-        				continut();
-        		    	update();
-        		    	if(totalFis == 0)
-        		    		descriere.setText("Selectati un articol.");
-        			}
+        		if(adminPriv == true)
+        		{
+        			if(totalFis == 0)
+            			JOptionPane.showMessageDialog(fereastraPr, "Nu exista produse");
+        			else
+        			if(lista.getSelectedValue() == null)
+        		        JOptionPane.showMessageDialog(fereastraPr, "Alegeti un produs!");
+        		    else 
+        		    {
+        		         String a = lista.getSelectedValue().toString();
+        		         for(int i = 0; i < totalFis; i++) {
+        			        if(obiecte[i].getAfisare().equals(lista.getSelectedValue().toString())) {
+        				       deleteInstante(obiecte[i]);
+        				       continut();
+        		    	       update();
+        		    	       descriere.setText("Selectati un articol.");
+        			        }
+        		          }
+        		    }
         		}
-        		}
+        		else
+        			JOptionPane.showMessageDialog(fereastraPr, "Numai administratorii pot folosi aceasta functie!");
         	}
         });
-
+        
+        //adaugarea ascultatorului pentru butonul de cautare dupa pret
         cautare.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		pretIn = Double.parseDouble(JOptionPane.showInputDialog(null,"Introduceti un pret: "));
@@ -687,7 +701,7 @@ class Grafica {
   		cancelAdd.addActionListener(new ActionListener() {
   			public void actionPerformed(ActionEvent e) {
   				changePanel(fereastraPr);
-  				setTitle("Produse");
+  				setTitle("Produse - " + numeUtil);
   				setSize(400,400);
   			}
   		});
